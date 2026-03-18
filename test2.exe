@@ -1,0 +1,157 @@
+
+TEST_MESSAGES2=(
+    "Test 1: Checking peers and packages after initialisation"
+    "Test 2: Incorrect arguments to addpackage"
+    "Test 3: Adding a package"
+    "Test 4: Incorrect arguments to removepackage"
+    "Test 5: Removing a package"
+    "Test 6: Extensively testing packages, including creating a file, incomplete files, multiple packages"
+)
+
+P2_DIR="tests/part2test"
+NUM_TESTS=6
+
+echo Begin Part 2 testing
+for i in $(seq 1 $NUM_TESTS); do
+    TEST_DIR="$P2_DIR/test$i"
+    TEST_IN="$TEST_DIR/test.in"
+    TEST_OUT="$TEST_DIR/test.out"
+    TEST_EXPECTED="$TEST_DIR/test.expected"
+    cat "$TEST_IN" | ./btide config.cfg > "$TEST_OUT"
+    if diff -q "$TEST_OUT" "$TEST_EXPECTED" > /dev/null; then
+        echo "${TEST_MESSAGES2[$((i-1))]}: PASSED"
+    else
+        echo "${TEST_MESSAGES2[$((i-1))]}: FAILED"
+    fi
+done
+log_file="tests/part2test/test7/test.out" 
+temp_file="tests/part2test/test7/test.temp" 
+: > "$log_file"
+
+clean_and_sort() {
+  tr -s '[:space:]' '\n' < "$1" | grep -v '^$' | sort > "$1.cleaned"
+}
+#This will act as a server, initaliase a instance using tmux
+tmux new-session -d -s btide_session "./btide config2.cfg"
+tmux new-session -d -s btide_session3 "./btide config3.cfg"
+tmux new-session -d -s btide_session10 "./btide config4.cfg"
+
+
+#This will act as a host
+tmux new-session -d -s btide_session2 "script -f -c './btide config.cfg' $log_file 2>&1"
+
+sleep 3
+#Pass in standard inputs
+tmux send-keys -t btide_session2 "CONNECT 127.0.0.1:8999" C-m
+tmux send-keys -t btide_session2 "PEERS" C-m
+tmux send-keys -t btide_session2 "QUIT" C-m
+
+#Clean the output file
+tail -n +2 "$log_file" > "$temp_file"
+mv "$temp_file" "$log_file"
+clean_and_sort "tests/part2test/test7/test.out"
+clean_and_sort "tests/part2test/test7/test.expected"
+if diff "tests/part2test/test7/test.out.cleaned" "tests/part2test/test7/test.expected.cleaned" > /dev/null; then
+    echo Test 7: Connecting to a server: PASSED
+    else
+    echo Test 7: Connecting to a server: FAILED
+    fi
+#Test 8
+log_file="tests/part2test/test8/test.out" 
+temp_file="tests/part2test/test8/test.temp" 
+: > "$log_file"
+#Create an instance of client
+tmux new-session -d -s btide_session5 "script -f -c './btide config.cfg' $log_file 2>&1"
+
+sleep 2
+#Wait for client to set up
+#Pass in standard inputs
+tmux send-keys -t btide_session5 "CONNECT NOTANIP" C-m
+tmux send-keys -t btide_session5 "CONNECT 127.0.0.1:8999" C-m
+tmux send-keys -t btide_session5 "CONNECT 127.0.0.1:8998" C-m
+tmux send-keys -t btide_session5 "PEERS" C-m
+tmux send-keys -t btide_session5 "QUIT" C-m
+#Clean the output and expected file
+tail -n +2 "$log_file" > "$temp_file"
+mv "$temp_file" "$log_file"
+clean_and_sort "tests/part2test/test8/test.out"
+clean_and_sort "tests/part2test/test8/test.expected"
+if diff "tests/part2test/test8/test.out.cleaned" "tests/part2test/test8/test.expected.cleaned" > /dev/null; then
+    echo Test 8: Making multiple connections: PASSED
+    else
+    echo Test 8: Making multiple connections: FAILED
+    fi
+
+
+#Test 9
+log_file="tests/part2test/test9/test.out" 
+temp_file="tests/part2test/test9/test.temp"
+: > "$log_file"
+#Create client
+tmux new-session -d -s btide_session4 "script -f -c './btide config.cfg' $log_file 2>&1"
+#Wait for client to set up
+sleep 2
+#Pass in standard inputs
+tmux send-keys -t btide_session4 "CONNECT 127.0.0.1:8999" C-m
+tmux send-keys -t btide_session4 "CONNECT 127.0.0.1:8998" C-m
+tmux send-keys -t btide_session4 "PEERS" C-m
+tmux send-keys -t btide_session4 "DISCONNECT 127.0.0.1:8999" C-m
+tmux send-keys -t btide_session4 "PEERS" C-m
+tmux send-keys -t btide_session4 "DISCONNECT 127.0.0.1:8998" C-m
+tmux send-keys -t btide_session4 "PEERS" C-m
+tmux send-keys -t btide_session4 "DISCONNECT 127.0.0.1:8997" C-m
+tmux send-keys -t btide_session4 "PEERS" C-m
+tmux send-keys -t btide_session4 "QUIT" C-m
+#Clean the output and expected file
+tail -n +2 "$log_file" > "$temp_file"
+mv "$temp_file" "$log_file"
+clean_and_sort "tests/part2test/test9/test.out"
+clean_and_sort "tests/part2test/test9/test.expected"
+if diff "tests/part2test/test9/test.out.cleaned" "tests/part2test/test9/test.expected.cleaned" > /dev/null; then
+    echo Test 9: Testing disconnections from existing peers: PASSED
+    else
+    echo Test 9: Testing disconnections from existing peers: FAILED
+    fi
+
+#Test 10
+log_file="tests/part2test/test10/test.out" 
+temp_file="tests/part2test/test10/test.temp"
+: > "$log_file"
+#Create client
+tmux new-session -d -s btide_session7 "script -f -c './btide config.cfg' $log_file 2>&1"
+#Wait for client to set up
+sleep 2
+##Pass in standard inputs
+tmux send-keys -t btide_session7 "CONNECT nothing" C-m
+tmux send-keys -t btide_session7 "CONNECT 127.0.0.1:8999" C-m
+tmux send-keys -t btide_session7 "CONNECT 12345" C-m
+tmux send-keys -t btide_session7 "CONNECT abcdef:34" C-m
+tmux send-keys -t btide_session7 "CONNECT 127.0.0.1:8998" C-m
+tmux send-keys -t btide_session7 "CONNECT 127.0.0.1:8998" C-m
+tmux send-keys -t btide_session7 "PEERS" C-m
+tmux send-keys -t btide_session7 "CONNECT 127.0.0.1:8997" C-m
+sleep 2
+tmux send-keys -t btide_session7 "PEERS" C-m
+tmux send-keys -t btide_session7 "DISCONNECT 127.0.0.1:8997" C-m
+tmux send-keys -t btide_session7 "DISCONNECT 127.0.0.1:8997" C-m
+tmux send-keys -t btide_session7 "DISCONNECT efgh:8997" C-m
+tmux send-keys -t btide_session7 "DISCONNECT NOWAY" C-m
+tmux send-keys -t btide_session7 "PEERS" C-m
+tmux send-keys -t btide_session7 "DISCONNECT 127.0.0.1:8998" C-m
+tmux send-keys -t btide_session7 "PEERS" C-m
+tmux send-keys -t btide_session7 "QUIT" C-m
+
+tail -n +2 "$log_file" > "$temp_file"
+mv "$temp_file" "$log_file"
+clean_and_sort "tests/part2test/test10/test.out"
+clean_and_sort "tests/part2test/test10/test.expected"
+
+if diff "tests/part2test/test10/test.out.cleaned" "tests/part2test/test10/test.expected.cleaned" > /dev/null; then
+    echo Test 10: Extensively testing peer management: PASSED
+    else
+    echo Test 10: Extensively testing peer management FAILED
+    fi
+#Kill the server sessions
+tmux kill-session -t btide_session
+tmux kill-session -t btide_session3
+tmux kill-session -t btide_session10

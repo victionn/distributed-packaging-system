@@ -1,0 +1,8 @@
+1. e370a823bf279694ddb22af800dcaad9, tests/file1.data : COMPLETED
+1. e370a823bf279694ddb22af800dcaad9, tests/file1.data : COMPLETED
+2. f3ee1a79fd1dc868d43939bc2db3b5ea, tests/file2.dat : INCOMPLETE
+Missing identifier amount, please specify whole 1024 characters or at least 20 characters.
+Identifier provided does not match managed packages
+Package has been removed
+Package has been removed
+No packages managed

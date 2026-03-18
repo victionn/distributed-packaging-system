@@ -1,0 +1,37 @@
+#!/bin/bash
+
+#Path to pkg program
+
+P1_DIR="tests/part1test"
+P2_DIR="tests/part2test"
+NUM_TESTS=10
+
+TEST_MESSAGES1=(
+    "Test 1: Running the program with no parameters"
+    "Test 2: Checking if the data file referenced by the bpkg exists"
+    "Test 3: Case where number of chunks and hashes are invalid"
+    "Test 4: Parsing a file where the identifier is not in hexadecimal"
+    "Test 5: Testing if the bpkg file and its corresponding hashes and chunks are correctly read"
+    "Test 6: Testing if the merkle tree is correctly built, and returns the root for a complete bpkg and data file"
+    "Test 7: Testing whether providing the right child of the root returns the second half chunk hashes using hashes_of"
+    "Test 8: Testing if -chunk_check correctly returns the completed chunks"
+    "Test 9: Check if the computed root value is correctly matching the one in bpkg"
+    "Test 10: A bpkg file containing a non existant data file is parsed. Data file should be created"
+)
+
+echo Begin Part 1 testing
+for i in $(seq 1 $NUM_TESTS); do
+    TEST_DIR="$P1_DIR/test$i"
+    TEST_IN="$TEST_DIR/test.in"
+    TEST_OUT="$TEST_DIR/test.out"
+    TEST_EXPECTED="$TEST_DIR/test.expected"
+    #Run the program and pass into test.out
+    TEST_ARGS=$(cat $TEST_IN)
+    ./pkgmain $TEST_ARGS > "$TEST_OUT"
+    #Compare the outputs
+    if diff -q "$TEST_OUT" "$TEST_EXPECTED" > /dev/null; then
+        echo "${TEST_MESSAGES1[$((i-1))]}: PASSED"
+    else
+    echo "${TEST_MESSAGES1[$((i-1))]}: FAILED"
+    fi
+done

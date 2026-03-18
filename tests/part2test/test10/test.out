@@ -1,0 +1,45 @@
+CONNECT nothing
+Missing address and port argument
+CONNECT 127.0.0.1:8999
+Connection established with peer
+CONNECT 12345
+Missing address and port argument
+CONNECT abcdef:34
+Unable to connect to request peer
+CONNECT 127.0.0.1:8998
+Connection established with peer
+CONNECT 127.0.0.1:8998
+Error: Connection already made
+PEERS
+Connected to:
+
+1. 127.0.0.1:8999
+2. 127.0.0.1:8998
+CONNECT 127.0.0.1:8997
+Connection established with peer
+PEERS
+Connected to:
+
+1. 127.0.0.1:8999
+2. 127.0.0.1:8998
+3. 127.0.0.1:8997
+DISCONNECT 127.0.0.1:8997
+Disconnected from peer
+DISCONNECT 127.0.0.1:8997
+Unknown peer, not connected
+DISCONNECT efgh:8997
+Unknown peer, not connected
+DISCONNECT NOWAY
+Missing address and port argument
+PEERS
+Connected to:
+
+1. 127.0.0.1:8999
+2. 127.0.0.1:8998
+DISCONNECT 127.0.0.1:8998
+Disconnected from peer
+PEERS
+Connected to:
+
+1. 127.0.0.1:8999
+QUIT

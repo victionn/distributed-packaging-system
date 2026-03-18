@@ -1,0 +1,12 @@
+CONNECT NOTANIP
+Missing address and port argument
+CONNECT 127.0.0.1:8999
+Connection established with peer
+CONNECT 127.0.0.1:8998
+Connection established with peer
+PEERS
+Connected to:
+
+1. 127.0.0.1:8999
+2. 127.0.0.1:8998
+QUIT

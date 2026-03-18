@@ -1,0 +1,7 @@
+CONNECT 127.0.0.1:8999
+Connection established with peer
+PEERS
+Connected to:
+
+1. 127.0.0.1:8999
+QUIT
